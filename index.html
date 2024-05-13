@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Фінансові показники</title>
+    <!-- Підключення Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+    <style>
+        /* Додаткові стилі */
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <h2 class="text-center">Розрахунок фінансових показників</h2>
+
+            <!-- Форма для введення даних -->
+            <form id="liquidityForm" class="text-center">
+                Грошові кошти та короткострокові вкладення (р.1160+р.1165) Ф1: <input type="number" id="cash" name="cash" min="0" class="form-control mb-2">
+                Оборотні кошти р.1195 Ф1: <input type="number" id="currentAssets" name="currentAssets" min="0" class="form-control mb-2">
+                Товарно-матеріальні запаси р.1100 Ф1: <input type="number" id="inventories" name="inventories" min="0" class="form-control mb-2">
+                Короткострокові зобов'язання р.3 пасиву балансу р. 1695 Ф1: <input type="number" id="currentLiabilities" name="currentLiabilities" min="0" class="form-control mb-2">
+                Необоротні активи р.1 активу балансу р.1095 Ф1: <input type="number" id="nonCurrentAssets" name="nonCurrentAssets" min="0" class="form-control mb-2">
+                Власний капітал р.1 пасиву балансу р.1495 Ф1 : <input type="number" id="equity" name="equity" min="0" class="form-control mb-2">
+                Валюта (підсумок) балансу р.1300 або р.1900 Ф1: <input type="number" id="balanceCurrency" name="balanceCurrency" min="0" class="form-control mb-2">
+                <input type="button" value="Розрахувати" onclick="calculate()" class="btn btn-primary">
+            </form>
+
+            <!-- Параграфи для виведення результатів -->
+            <p id="absoluteLiquidityRatio" class="text-center"></p>
+            <p id="coverageRatio" class="text-center"></p>
+            <p id="quickLiquidityRatio" class="text-center"></p>
+            <p id="ownWorkingCapital" class="text-center"></p>
+            <p id="totalLiabilities" class="text-center"></p>
+            <p id="equityConcentrationRatio" class="text-center"></p>
+            <p id="borrowedCapitalConcentrationRatio" class="text-center"></p>
+            <p id="borrowedToEquityRatio" class="text-center"></p>
+        </div>
+    </div>
+</div>
+
+<!-- JavaScript код -->
+<script>
+function calculate() {
+    // Отримання значень з форми
+    let cash = parseFloat(document.getElementById('cash').value);
+    let currentAssets = parseFloat(document.getElementById('currentAssets').value);
+    let inventories = parseFloat(document.getElementById('inventories').value);
+    let currentLiabilities = parseFloat(document.getElementById('currentLiabilities').value);
+    let nonCurrentAssets = parseFloat(document.getElementById('nonCurrentAssets').value);
+    let equity = parseFloat(document.getElementById('equity').value);
+    let balanceCurrency = parseFloat(document.getElementById('balanceCurrency').value);
+
+    // Отримання елементів для виведення результатів
+    let absoluteLiquidityRatioElement = document.getElementById('absoluteLiquidityRatio');
+    let coverageRatioElement = document.getElementById('coverageRatio');
+    let quickLiquidityRatioElement = document.getElementById('quickLiquidityRatio');
+    let ownWorkingCapitalElement = document.getElementById('ownWorkingCapital');
+    let totalLiabilitiesElement = document.getElementById('totalLiabilities');
+    let equityConcentrationRatioElement = document.getElementById('equityConcentrationRatio');
+    let borrowedCapitalConcentrationRatioElement = document.getElementById('borrowedCapitalConcentrationRatio');
+    let borrowedToEquityRatioElement = document.getElementById('borrowedToEquityRatio');
+
+    // Перевірка, чи всі поля заповнені
+    if (isNaN(cash) || isNaN(currentAssets) || isNaN(inventories) || isNaN(currentLiabilities) || isNaN(nonCurrentAssets) || isNaN(equity) || isNaN(balanceCurrency)) {
+        absoluteLiquidityRatioElement.innerHTML = "Будь ласка, заповніть всі поля коректними числовими значеннями.";
+        coverageRatioElement.innerHTML = "";
+        quickLiquidityRatioElement.innerHTML = "";
+        ownWorkingCapitalElement.innerHTML = "";
+        totalLiabilitiesElement.innerHTML = "";
+        equityConcentrationRatioElement.innerHTML = "";
+        borrowedCapitalConcentrationRatioElement.innerHTML = "";
+        borrowedToEquityRatioElement.innerHTML = "";
+        return;
+    }
+
+    // Розрахунок коефіцієнта абсолютної ліквідності
+    let absoluteLiquidity = cash / currentLiabilities;
+    absoluteLiquidityRatioElement.innerHTML = `Коефіцієнт абсолютної ліквідності: ${absoluteLiquidity.toFixed(2)}`;
+    // Розрахунок коефіцієнта покриття
+    let coverageRatio = currentAssets / currentLiabilities;
+    coverageRatioElement.innerHTML = `Коефіцієнт покриття: ${coverageRatio.toFixed(2)}`;
+    // Розрахунок коефіцієнта швидкої ліквідності
+    let quickLiquidity = (currentAssets - inventories) / currentLiabilities;
+    quickLiquidityRatioElement.innerHTML = `Коефіцієнт швидкої ліквідності: ${quickLiquidity.toFixed(2)}`;
+    // Розрахунок власних обігових коштів
+    let ownWorkingCapital = equity - nonCurrentAssets;
+    ownWorkingCapitalElement.innerHTML = `Власні обігові кошти: ${ownWorkingCapital.toFixed(2)}`;
+    // Розрахунок суми зобов'язань
+    let totalLiabilities = balanceCurrency - equity;
+    totalLiabilitiesElement.innerHTML = `Зобов'язання: ${totalLiabilities.toFixed(2)}`;
+    // Розрахунок коефіцієнта концентрації власного капіталу
+    let equityConcentrationRatio = (equity / balanceCurrency) * 100;
+    equityConcentrationRatioElement.innerHTML = `Коефіцієнт концентрації власного капіталу: ${equityConcentrationRatio.toFixed(2)}%`;
+    // Розрахунок коефіцієнта концентрації залученого капіталу
+    let borrowedCapitalConcentrationRatio = (totalLiabilities / balanceCurrency) * 100;
+    borrowedCapitalConcentrationRatioElement.innerHTML = `Коефіцієнт концентрації залученого капіталу: ${borrowedCapitalConcentrationRatio.toFixed(2)}%`;
+    // Розрахунок співвідношення залученого капіталу до власного
+    let borrowedToEquityRatio = totalLiabilities / equity;
+    borrowedToEquityRatioElement.innerHTML = `Співвідношення залученого капіталу до власного: ${borrowedToEquityRatio.toFixed(2)}`;
+}
+</script>
+</body>
+</html>
